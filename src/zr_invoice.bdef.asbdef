@@ -1,0 +1,61 @@
+managed implementation in class ZCL_INV_PROC unique;
+strict ( 1 );
+with draft;
+
+define behavior for ZR_INVOICE alias Invoice
+persistent table zinvoice
+draft table ZINVOICE_DRAFT
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master( global )
+
+{
+   field ( numbering : managed, readonly )
+   InvoiceUUID;
+
+  field ( readonly )
+   InternalReferenceNumber,
+   LocalCreatedAt,
+   LocalCreatedBy,
+   LastChangedAt,
+   LocalLastChangedAt,
+   LocalLastChangedBy;
+
+  determination setInvoiceRefNum on save { field InternalReferenceNumber; create; }
+
+  create;
+  update;
+  delete;
+
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for ZINVOICE
+  {
+    InvoiceUUID = INVOICE_UUID;
+    InternalReferenceNumber = INTERNAL_REFERENCE_NUMBER;
+    InvoiceReceiptDate = INVOICE_RECEIPT_DATE;
+    DueDate = DUE_DATE;
+    VendorVatNumber = VENDOR_VAT_NUMBER;
+    Subtotal = SUBTOTAL;
+    Currency = CURRENCY;
+    Total = TOTAL;
+    AmountDue = AMOUNT_DUE;
+    Tax = TAX;
+    VendorAddress = VENDOR_ADDRESS;
+    VendorName = VENDOR_NAME;
+    Mimetype = MIMETYPE;
+    Filename = FILENAME;
+    TmpMimetype = TMP_MIMETYPE;
+    TmpFilename = TMP_FILENAME;
+    TmpAttachment = TMP_ATTACHMENT;
+    LocalCreatedBy = LOCAL_CREATED_BY;
+    LocalCreatedAt = LOCAL_CREATED_AT;
+    LocalLastChangedBy = LOCAL_LAST_CHANGED_BY;
+    LocalLastChangedAt = LOCAL_LAST_CHANGED_AT;
+    LastChangedAt = LAST_CHANGED_AT;
+  }
+}

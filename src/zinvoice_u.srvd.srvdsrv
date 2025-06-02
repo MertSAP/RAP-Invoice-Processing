@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service definition forZC_INVOICE'
+define service ZINVOICE_U {
+  expose ZC_INVOICE as Invoice;
+}

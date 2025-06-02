@@ -1,0 +1,137 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Invoice', 
+    typeNamePlural: 'Invoices'
+  }
+}
+annotate view ZC_INVOICE with
+{
+  @UI.facet: [ {
+    id: 'idIdentification', 
+    type: #IDENTIFICATION_REFERENCE, 
+    label: 'Invoice', 
+    position: 10 
+  } ]
+ 
+   @UI.hidden: true
+  invoiceuuid;
+  
+   @UI.lineItem: [ {
+    position: 10 , 
+    importance: #MEDIUM, 
+    label: 'Internal Reference Number'
+  } ]
+   @UI.identification: [ {
+    position: 10 , 
+    label: 'Internal Reference Number'
+  } ]
+  internalreferencenumber;
+  
+   @UI.lineItem: [ {
+    position: 20 , 
+    importance: #MEDIUM, 
+    label: 'Invoice Receipt Date'
+  } ]
+   @UI.identification: [ {
+    position: 20 , 
+    label: 'Invoice Receipt Date'
+  } ]
+  invoicereceiptdate;
+  
+   @UI.lineItem: [ {
+    position: 30 , 
+    importance: #MEDIUM, 
+    label: 'Due Date'
+  } ]
+   @UI.identification: [ {
+    position: 30 , 
+    label: 'Due Date'
+  } ]
+  duedate;
+  
+ 
+   @UI.identification: [ {
+    position: 40 , 
+    label: 'VAT Number'
+  } ]
+  vendorvatnumber;
+  
+ 
+   @UI.identification: [ {
+    position: 50 , 
+    label: 'Sub Total'
+  } ]
+  subtotal;
+  
+ 
+   @UI.identification: [ {
+    position: 60 , 
+    label: 'Currency'
+  } ]
+  currency;
+  
+   @UI.lineItem: [ {
+    position: 40 , 
+    importance: #MEDIUM, 
+    label: 'Total'
+  } ]
+   @UI.identification: [ {
+    position: 70 , 
+    label: 'Total'
+  } ]
+  total;
+  
+
+   @UI.identification: [ {
+    position: 80 , 
+    label: 'Amount Due'
+  } ]
+  amountdue;
+  
+ 
+   @UI.identification: [ {
+    position: 90 , 
+    label: 'Tax'
+  } ]
+  tax;
+  
+ 
+   @UI.identification: [ {
+    position: 100 , 
+    label: 'Vendor Address'
+  } ]
+  vendoraddress;
+  
+   @UI.lineItem: [ {
+    position: 50 , 
+    importance: #MEDIUM, 
+    label: 'Vendor Name'
+  } ]
+   @UI.identification: [ {
+    position: 110 , 
+    label: 'Vendor Name'
+  } ]
+  vendorname;
+  
+    @UI.hidden: true
+  mimetype;
+  
+    @UI.hidden: true
+  filename;
+  
+    @UI.hidden: true
+  tmpmimetype;
+  
+    @UI.hidden: true
+  tmpfilename;
+  
+   @UI.identification: [ {
+    position: 120 , 
+    label: 'Attachment'
+  } ]
+  tmpattachment;
+  
+   @UI.hidden: true
+  locallastchangedat;
+}
