@@ -22,7 +22,7 @@ authorization master( global )
    LocalLastChangedBy;
 
   determination setInvoiceRefNum on save { field InternalReferenceNumber; create; }
-
+    determination uploadToS3 on save { create; update; }
   create;
   update;
   delete;

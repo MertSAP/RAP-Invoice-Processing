@@ -15,7 +15,7 @@ annotate view ZC_INVOICE with
   } ]
  
    @UI.hidden: true
-  invoiceuuid;
+  InvoiceUUID;
   
    @UI.lineItem: [ {
     position: 10 , 
@@ -26,7 +26,7 @@ annotate view ZC_INVOICE with
     position: 10 , 
     label: 'Internal Reference Number'
   } ]
-  internalreferencenumber;
+  InternalReferenceNumber;
   
    @UI.lineItem: [ {
     position: 20 , 
@@ -37,7 +37,7 @@ annotate view ZC_INVOICE with
     position: 20 , 
     label: 'Invoice Receipt Date'
   } ]
-  invoicereceiptdate;
+  InvoiceReceiptDate;
   
    @UI.lineItem: [ {
     position: 30 , 
@@ -48,28 +48,28 @@ annotate view ZC_INVOICE with
     position: 30 , 
     label: 'Due Date'
   } ]
-  duedate;
+  DueDate;
   
  
    @UI.identification: [ {
     position: 40 , 
     label: 'VAT Number'
   } ]
-  vendorvatnumber;
+  VendorVatNumber;
   
  
    @UI.identification: [ {
     position: 50 , 
     label: 'Sub Total'
   } ]
-  subtotal;
+  Subtotal;
   
  
    @UI.identification: [ {
     position: 60 , 
     label: 'Currency'
   } ]
-  currency;
+  Currency;
   
    @UI.lineItem: [ {
     position: 40 , 
@@ -80,28 +80,28 @@ annotate view ZC_INVOICE with
     position: 70 , 
     label: 'Total'
   } ]
-  total;
+  Total;
   
 
    @UI.identification: [ {
     position: 80 , 
     label: 'Amount Due'
   } ]
-  amountdue;
+  AmountDue;
   
  
    @UI.identification: [ {
     position: 90 , 
     label: 'Tax'
   } ]
-  tax;
+  Tax;
   
  
    @UI.identification: [ {
     position: 100 , 
     label: 'Vendor Address'
   } ]
-  vendoraddress;
+  VendorAddress;
   
    @UI.lineItem: [ {
     position: 50 , 
@@ -112,26 +112,31 @@ annotate view ZC_INVOICE with
     position: 110 , 
     label: 'Vendor Name'
   } ]
-  vendorname;
+  VendorName;
   
     @UI.hidden: true
-  mimetype;
+  Mimetype;
   
     @UI.hidden: true
-  filename;
+  Filename;
   
     @UI.hidden: true
-  tmpmimetype;
+  TmpMimetype;
   
     @UI.hidden: true
-  tmpfilename;
+  TmpFilename;
   
    @UI.identification: [ {
     position: 120 , 
-    label: 'Attachment'
+    label: 'New Attachment'
   } ]
-  tmpattachment;
+  TmpAttachment;
   
+   @UI.identification: [ {
+    position: 130 , 
+    label: 'Stored Attachment'
+  } ]
+  attachment;
    @UI.hidden: true
-  locallastchangedat;
+  LocalLastChangedAt;
 }
