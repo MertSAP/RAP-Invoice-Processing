@@ -5,10 +5,13 @@ CLASS lhc_invoice DEFINITION INHERITING FROM cl_abap_behavior_handler.
         IMPORTING
         REQUEST requested_authorizations FOR Invoice
         RESULT result,
-      setInvoiceRefNum FOR DETERMINE ON SAVE
+      setInvoiceRefNum FOR DETERMINE ON MODIFY
         IMPORTING keys FOR Invoice~setInvoiceRefNum,
-      uploadToS3 FOR DETERMINE ON SAVE
-        IMPORTING keys FOR Invoice~uploadToS3.
+      uploadToS3 FOR DETERMINE ON MODIFY
+        IMPORTING keys FOR Invoice~uploadToS3,
+      get_extract_results IMPORTING
+        iv_invoice type zc_invoice
+       RETURNING VALUE(rv_invoice) TYPE zc_invoice.
 ENDCLASS.
 
 CLASS lhc_invoice IMPLEMENTATION.
@@ -69,6 +72,11 @@ CLASS lhc_invoice IMPLEMENTATION.
       IF s3_successfull EQ abap_true.
         invoice_entity-Filename = storage_helper->get_filename( invoice_entity-TmpFilename ).
         invoice_entity-MimeType = invoice_entity-TmpMimetype.
+        data: invoice type zc_invoice.
+           invoice = CORRESPONDING #(  invoice_entity ) .
+        DATA(ls_invoice) = get_extract_results(  invoice ).
+
+        invoice_entity = CORRESPONDING #( ls_invoice ).
       ELSE.
         CLEAR invoice_entity-Filename.
         CLEAR invoice_entity-MimeType.
@@ -78,9 +86,12 @@ CLASS lhc_invoice IMPLEMENTATION.
       CLEAR invoice_entity-TmpFilename.
       CLEAR invoice_entity-TmpMimetype.
 
+
+
+
       MODIFY ENTITIES OF zr_invoice IN LOCAL MODE
       ENTITY Invoice
-      UPDATE FIELDS ( TmpAttachment TmpFilename TmpMimetype Filename Mimetype )
+      UPDATE FIELDS ( TmpAttachment TmpFilename TmpMimetype Filename Mimetype VendorAddress VendorName VendorVatNumber  )
         WITH VALUE #( ( %key   =  invoice_entity-%key
                   %is_draft     = invoice_entity-%is_draft
                   TmpAttachment = invoice_entity-TmpAttachment
@@ -88,7 +99,9 @@ CLASS lhc_invoice IMPLEMENTATION.
                   TmpMimetype = invoice_entity-TmpMimetype
                   Filename = invoice_entity-Filename
                   MimeType =  invoice_entity-MimeType
-
+                  VendorAddress  =  invoice_entity-VendorAddress
+                  VendorName  =  invoice_entity-VendorName
+                  VendorVatNumber  =  invoice_entity-VendorVatNumber
                   ) )
                   FAILED DATA(failed_update)
                   REPORTED DATA(reported_update).
@@ -96,6 +109,29 @@ CLASS lhc_invoice IMPLEMENTATION.
     ENDLOOP.
 
 
+  ENDMETHOD.
+
+  METHOD get_extract_results.
+    DATA(o_extract) = NEW zcl_invoice_extract( iv_invoice-Filename ).
+    DATA: message TYPE char100.
+    DATA: lt_header_fields TYPE ztt_aws_keyvalue.
+          rv_invoice = iv_invoice.
+    o_extract->get_text_from_document( IMPORTING ev_header = lt_header_fields ev_message = message ).
+
+    TRY.
+        rv_invoice-VendorAddress = lt_header_fields[ key = 'VENDOR_ADDRESS' ]-value.
+      CATCH cx_sy_itab_line_not_found.
+    ENDTRY.
+
+    TRY.
+        rv_invoice-VendorName = lt_header_fields[ key = 'VENDOR_NAME' ]-value.
+      CATCH cx_sy_itab_line_not_found.
+    ENDTRY.
+
+    TRY.
+        rv_invoice-VendorVatNumber = lt_header_fields[ key = 'VENDOR_VAT_NUMBER' ]-value.
+      CATCH cx_sy_itab_line_not_found.
+    ENDTRY.
   ENDMETHOD.
 
 ENDCLASS.

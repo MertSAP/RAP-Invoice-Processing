@@ -1,5 +1,5 @@
 managed implementation in class ZCL_INV_PROC unique;
-strict ( 1 );
+strict ( 2 );
 with draft;
 
 define behavior for ZR_INVOICE alias Invoice
@@ -21,8 +21,11 @@ authorization master( global )
    LocalLastChangedAt,
    LocalLastChangedBy;
 
-  determination setInvoiceRefNum on save { field InternalReferenceNumber; create; }
-    determination uploadToS3 on save { create; update; }
+  determination setInvoiceRefNum on modify { field InternalReferenceNumber; create;  }
+ //   determination uploadToS3 on save { create; update; }
+ determination uploadToS3 on modify { field TmpMimetype; create; update; }
+
+
   create;
   update;
   delete;
