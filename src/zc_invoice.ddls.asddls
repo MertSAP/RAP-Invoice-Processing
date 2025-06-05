@@ -24,8 +24,8 @@ define root view entity ZC_INVOICE
   TmpMimetype,
   TmpFilename,
   @Semantics.largeObject:
-              { mimeType: 'TmpFilename',
-              fileName: 'TmpMimetype',
+              { mimeType: 'TmpMimetype',
+              fileName: 'TmpFilename',
               contentDispositionPreference: #INLINE }
   TmpAttachment,
   LocalLastChangedAt
