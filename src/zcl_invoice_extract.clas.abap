@@ -7,18 +7,19 @@ CLASS zcl_invoice_extract DEFINITION
 
 
 
-    METHODS constructor
-      IMPORTING
-        iv_filename TYPE zfile_name.
+    METHODS constructor.
 
-    METHODS get_text_from_document EXPORTING
-                                     ev_message TYPE char100
-                                     ev_header  TYPE ZTT_AWS_KEYVALUE.
+    METHODS get_text_from_document IMPORTING iv_bytes   TYPE xstring
+                                   EXPORTING
 
+                                             ev_message TYPE char100
+                                             ev_header  TYPE ztt_aws_keyvalue
+                                             et_items   TYPE ztt_invitemline.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS invoke_textract
+      IMPORTING iv_bytes   TYPE xstring
       EXPORTING ev_result  TYPE REF TO /aws1/cl_texanalyzeexpensersp
                 ev_message TYPE char100.
 
@@ -37,7 +38,7 @@ ENDCLASS.
 
 CLASS zcl_invoice_extract IMPLEMENTATION.
   METHOD constructor.
-    filename = iv_filename.
+
     DATA(lo_session) = /aws1/cl_rt_session_aws=>create( cv_pfl ).
     o_tex = /aws1/cl_tex_factory=>create(
         io_session = lo_session ).
@@ -46,7 +47,7 @@ CLASS zcl_invoice_extract IMPLEMENTATION.
 
   METHOD get_text_from_document.
     DATA: oo_result TYPE REF TO /aws1/cl_texanalyzeexpensersp.
-    invoke_textract(  IMPORTING ev_result = oo_result ev_message = ev_message ).
+    invoke_textract(  EXPORTING iv_bytes  = iv_bytes IMPORTING ev_result = oo_result ev_message = ev_message ).
 
     LOOP AT oo_result->get_expensedocuments( ) INTO DATA(lo_expense).
       LOOP AT lo_expense->get_summaryfields( ) INTO DATA(oo_summary_field).
@@ -55,15 +56,42 @@ CLASS zcl_invoice_extract IMPLEMENTATION.
             INTO TABLE ev_header.
         ENDIF.
 
+
       ENDLOOP.
     ENDLOOP.
+
+     LOOP AT lo_expense->get_lineitemgroups( ) INTO DATA(lo_groups).
+          LOOP AT lo_groups->get_lineitems(  ) INTO DATA(lo_lineitems).
+            DATA: ls_lineitem TYPE zsinvoice_item.
+            LOOP AT lo_lineitems->get_lineitemexpensefields(  ) INTO DATA(lo_lineitemfield).
+              IF lo_lineitemfield->get_type( ) IS BOUND AND lo_lineitemfield->get_valuedetection(  ) IS BOUND.
+              data(field) = lo_lineitemfield->get_type( )->get_text(  ).
+              if field EQ 'ITEM'.
+                    field = 'DESCRIPTION'.
+              endif.
+              if field EQ 'PRICE'.
+                    field = 'LINE_PRICE'.
+              endif.
+                ASSIGN COMPONENT  field OF STRUCTURE ls_lineitem TO FIELD-SYMBOL(<fs_field>).
+                IF sy-subrc = 0.
+                data(value) = lo_lineitemfield->get_valuedetection(  )->get_text(  ).
+                if value+0(1) EQ '$'.
+                    value = value+1.
+                endif.
+                 <fs_field> = value.
+                ENDIF.
+              ENDIF.
+            ENDLOOP.
+
+            INSERT ls_lineitem into table et_items.
+          ENDLOOP.
+        ENDLOOP.
   ENDMETHOD.
   METHOD invoke_textract.
-    DATA(lo_s3object) = NEW /aws1/cl_texs3object( iv_bucket = bucket
-     iv_name   = CONV /aws1/s3_objectkey( filename ) ).
+
 
     "Create an ABAP object for the document."
-    DATA(lo_document) = NEW /aws1/cl_texdocument( io_s3object = lo_s3object ).
+    DATA(lo_document) = NEW /aws1/cl_texdocument( iv_bytes  = iv_bytes  ).
 
     TRY.
         ev_result = o_tex->analyzeexpense(      "oo_result is returned for testing purposes."

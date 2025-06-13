@@ -6,7 +6,9 @@
 "ZINVOICE"
 ],
 "ASSOCIATED":
-[],
+[
+"ZR_INVOICE_ITEM"
+],
 "BASE":
 [],
 "ANNO_REF":

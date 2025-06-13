@@ -2,10 +2,13 @@
 @EndUserText.label: '##GENERATED Invoice Processing'
 define root view entity ZR_INVOICE
   as select from zinvoice as Invoice
+   composition [0..*] of ZR_INVOICE_ITEM  as _InvoiceItems
 {
   key invoice_uuid as InvoiceUUID,
   internal_reference_number as InternalReferenceNumber,
   invoice_receipt_date as InvoiceReceiptDate,
+  invoice_number as InvoiceNumber,
+  po_num as PONum,
   due_date as DueDate,
   vendor_vat_number as VendorVatNumber,
   @Semantics.amount.currencyCode: 'Currency'
@@ -33,6 +36,7 @@ define root view entity ZR_INVOICE
   @Semantics.systemDateTime.localInstanceLastChangedAt: true
   local_last_changed_at as LocalLastChangedAt,
   @Semantics.systemDateTime.lastChangedAt: true
-  last_changed_at as LastChangedAt
+  last_changed_at as LastChangedAt,
+  _InvoiceItems
   
 }

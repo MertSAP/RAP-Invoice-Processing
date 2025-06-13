@@ -1,0 +1,39 @@
+@Metadata.layer: #CORE
+@UI: {
+  headerInfo: {
+    typeName: 'Line Items', 
+    typeNamePlural: 'Line Items'
+  }
+}
+annotate entity ZC_INVOICE_ITEM
+    with 
+{
+   @UI.lineItem: [ {
+    position: 10 , 
+    importance: #MEDIUM, 
+    label: 'Line Description'
+  }]
+  Description;
+  
+    @UI.lineItem: [ {
+    position: 20 , 
+    importance: #MEDIUM, 
+    label: 'Qty'
+  }]
+  Quantity;
+  
+    @UI.lineItem: [ {
+    position: 30 , 
+    importance: #MEDIUM, 
+    label: 'Unit Price'
+  }]
+  UnitPrice;
+  
+    @UI.lineItem: [ {
+    position: 40 , 
+    importance: #MEDIUM, 
+    label: 'Line Total'
+  }]
+  LinePrice;
+    
+}

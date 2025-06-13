@@ -1,34 +1,40 @@
 managed implementation in class ZCL_INV_PROC unique;
 strict ( 2 );
 with draft;
-
 define behavior for ZR_INVOICE alias Invoice
 persistent table zinvoice
-draft table ZINVOICE_DRAFT
+draft table zinvoice_draft
 etag master LocalLastChangedAt
 lock master total etag LastChangedAt
-authorization master( global )
+authorization master ( global )
 
 {
-   field ( numbering : managed, readonly )
-   InvoiceUUID;
+  field ( numbering : managed, readonly )
+  InvoiceUUID;
 
   field ( readonly )
-   InternalReferenceNumber,
-   LocalCreatedAt,
-   LocalCreatedBy,
-   LastChangedAt,
-   LocalLastChangedAt,
-   LocalLastChangedBy;
+  InternalReferenceNumber,
+  LocalCreatedAt,
+  LocalCreatedBy,
+  LastChangedAt,
+  LocalLastChangedAt,
+  LocalLastChangedBy;
+  side effects
+  {
+    field TmpAttachment affects field Filename, field Mimetype, field TmpFilename, field VendorName, field VendorAddress, field InvoiceReceiptDate, field Total, field Tax, field AmountDue, field Subtotal,
+    field VendorVatNumber, field DueDate, field PONum, field InvoiceNumber, entity _InvoiceItems;
+  }
 
-  determination setInvoiceRefNum on modify { field InternalReferenceNumber; create;  }
- //   determination uploadToS3 on save { create; update; }
- determination uploadToS3 on modify { field TmpMimetype; create; update; }
+  determination setInvoiceRefNum on save { field InternalReferenceNumber; create; }
+  determination uploadToS3 on save { create; update; }
+  determination populateFieldsFromAttachment on modify { field TmpAttachment; }
+  action populateFields result [1] $self;
 
+  validation checkDuplicate on save { create; }
 
   create;
-  update;
-  delete;
+  update ( features : instance );
+  delete ( features : instance );
 
   draft action Edit;
   draft action Activate;
@@ -36,29 +42,71 @@ authorization master( global )
   draft action Resume;
   draft determine action Prepare;
 
-  mapping for ZINVOICE
-  {
-    InvoiceUUID = INVOICE_UUID;
-    InternalReferenceNumber = INTERNAL_REFERENCE_NUMBER;
-    InvoiceReceiptDate = INVOICE_RECEIPT_DATE;
-    DueDate = DUE_DATE;
-    VendorVatNumber = VENDOR_VAT_NUMBER;
-    Subtotal = SUBTOTAL;
-    Currency = CURRENCY;
-    Total = TOTAL;
-    AmountDue = AMOUNT_DUE;
-    Tax = TAX;
-    VendorAddress = VENDOR_ADDRESS;
-    VendorName = VENDOR_NAME;
-    Mimetype = MIMETYPE;
-    Filename = FILENAME;
-    TmpMimetype = TMP_MIMETYPE;
-    TmpFilename = TMP_FILENAME;
-    TmpAttachment = TMP_ATTACHMENT;
-    LocalCreatedBy = LOCAL_CREATED_BY;
-    LocalCreatedAt = LOCAL_CREATED_AT;
-    LocalLastChangedBy = LOCAL_LAST_CHANGED_BY;
-    LocalLastChangedAt = LOCAL_LAST_CHANGED_AT;
-    LastChangedAt = LAST_CHANGED_AT;
-  }
+  mapping for zinvoice
+    {
+      InvoiceUUID             = INVOICE_UUID;
+      InternalReferenceNumber = INTERNAL_REFERENCE_NUMBER;
+      InvoiceReceiptDate      = INVOICE_RECEIPT_DATE;
+      PONum                   = PO_NUM;
+      InvoiceNumber           = INVOICE_NUMBER;
+      DueDate                 = DUE_DATE;
+      VendorVatNumber         = VENDOR_VAT_NUMBER;
+      Subtotal                = SUBTOTAL;
+      Currency                = CURRENCY;
+      Total                   = TOTAL;
+      AmountDue               = AMOUNT_DUE;
+      Tax                     = TAX;
+      VendorAddress           = VENDOR_ADDRESS;
+      VendorName              = VENDOR_NAME;
+      Mimetype                = MIMETYPE;
+      Filename                = FILENAME;
+      TmpMimetype             = TMP_MIMETYPE;
+      TmpFilename             = TMP_FILENAME;
+      TmpAttachment           = TMP_ATTACHMENT;
+      LocalCreatedBy          = LOCAL_CREATED_BY;
+      LocalCreatedAt          = LOCAL_CREATED_AT;
+      LocalLastChangedBy      = LOCAL_LAST_CHANGED_BY;
+      LocalLastChangedAt      = LOCAL_LAST_CHANGED_AT;
+      LastChangedAt           = LAST_CHANGED_AT;
+    }
+
+  // create booking by association
+  association _InvoiceItems { create ( features : instance ); with draft; }
+}
+
+define behavior for ZR_INVOICE_ITEM alias InvoiceItem
+implementation in class ZCL_INV_ITM_PROC unique
+persistent table zinvoice_item
+draft table zinvoice_item_d
+etag master LocalLastChangedAt
+lock dependent by _Invoice
+authorization dependent by _Invoice
+late numbering
+{
+  field ( readonly )
+  ItemNum,
+  LocalLastChangedAt,
+  InvoiceUuid;
+
+
+  update;
+  delete;
+
+  //validation(s)
+
+
+
+  mapping for zinvoice_item
+    {
+      InvoiceUUID        = invoice_uuid;
+      ItemNum            = item_num;
+      Quantity           = quantity;
+      Description        = description;
+      UnitPrice          = unit_price;
+      LinePrice          = line_price;
+      Currency           = currency;
+      LocalLastChangedAt = LOCAL_LAST_CHANGED_AT;
+    }
+
+  association _Invoice { with draft; }
 }

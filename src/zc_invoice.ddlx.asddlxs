@@ -7,12 +7,42 @@
 }
 annotate view ZC_INVOICE with
 {
-  @UI.facet: [ {
-    id: 'idIdentification', 
-    type: #IDENTIFICATION_REFERENCE, 
-    label: 'Invoice', 
-    position: 10 
+
+
+   @UI.facet: [ {
+    id: 'idCollection',
+    type: #COLLECTION,
+    label: 'Invoice',
+    position: 10
+  },
+  {
+    id: 'idIdentification',
+    parentId: 'idCollection',
+    type: #IDENTIFICATION_REFERENCE,
+    label: 'General Information',
+    position: 10
+  },
+  {
+    id: 'idCollectionCosts',
+    type: #COLLECTION,
+    label: 'Costs',
+    position: 30
+  },
+  {
+    id: 'idLineitem',
+    type: #LINEITEM_REFERENCE,
+    position: 20 ,
+    targetElement: '_InvoiceItems'
+  },
+  {
+    id: 'idCosts',
+    parentId: 'idCollectionCosts',
+    type: #FIELDGROUP_REFERENCE,
+    label: 'Cost',
+    targetQualifier: 'Costs',
+    position: 30
   } ]
+  
  
    @UI.hidden: true
   InvoiceUUID;
@@ -21,7 +51,7 @@ annotate view ZC_INVOICE with
     position: 10 , 
     importance: #MEDIUM, 
     label: 'Internal Reference Number'
-  } ]
+  }]
    @UI.identification: [ {
     position: 10 , 
     label: 'Internal Reference Number'
@@ -51,49 +81,42 @@ annotate view ZC_INVOICE with
   DueDate;
   
  
-   @UI.identification: [ {
-    position: 40 , 
-    label: 'VAT Number'
-  } ]
-  VendorVatNumber;
+  
   
  
    @UI.identification: [ {
     position: 50 , 
-    label: 'Sub Total'
+    label: 'Invoice #'
   } ]
-  Subtotal;
+  InvoiceNumber;
   
  
    @UI.identification: [ {
     position: 60 , 
-    label: 'Currency'
+    label: 'PO #'
   } ]
-  Currency;
+  PONum;
   
    @UI.lineItem: [ {
     position: 40 , 
     importance: #MEDIUM, 
     label: 'Total'
   } ]
-   @UI.identification: [ {
-    position: 70 , 
-    label: 'Total'
-  } ]
+   
+   
+  @UI.fieldGroup: [{ qualifier: 'Costs', position: 30, label: 'Sub Total'}]
+  Subtotal;
+  
+   @UI.fieldGroup: [{ qualifier: 'Costs', position: 40, label: 'Total'}]
   Total;
   
 
-   @UI.identification: [ {
-    position: 80 , 
-    label: 'Amount Due'
-  } ]
+ 
+  @UI.fieldGroup: [{ qualifier: 'Costs', position: 10, label: 'Amount Due'}]
   AmountDue;
   
  
-   @UI.identification: [ {
-    position: 90 , 
-    label: 'Tax'
-  } ]
+   @UI.fieldGroup: [{ qualifier: 'Costs', position: 20, label: 'Tax'}]
   Tax;
   
  
@@ -139,4 +162,10 @@ annotate view ZC_INVOICE with
   attachment;
    @UI.hidden: true
   LocalLastChangedAt;
+  
+   @UI.identification: [ {
+    position: 140 , 
+    label: 'ABN'
+  } ]
+  VendorVatNumber;
 }

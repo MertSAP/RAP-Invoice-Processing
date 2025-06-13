@@ -1,7 +1,7 @@
 projection;
-strict ( 1 );
+strict ( 2 );
 use draft;
-
+use side effects;
 define behavior for ZC_INVOICE alias Invoice
 use etag
 
@@ -9,10 +9,21 @@ use etag
   use create;
   use update;
   use delete;
-
+  use action populateFields;
   use action Edit;
   use action Activate;
   use action Discard;
   use action Resume;
   use action Prepare;
+  use association _InvoiceItems { create; with draft; }
+}
+
+define behavior for ZC_INVOICE_ITEM alias InvoiceItems
+use etag
+
+{
+  use update;
+  use delete;
+
+  use association _Invoice { with draft; }
 }

@@ -9,6 +9,8 @@ define root view entity ZC_INVOICE
   key     InvoiceUUID,
           InternalReferenceNumber,
           InvoiceReceiptDate,
+          InvoiceNumber,
+          PONum,
           DueDate,
           VendorVatNumber,
           Subtotal,
@@ -34,6 +36,7 @@ define root view entity ZC_INVOICE
                       fileName: 'TmpFilename',
                       contentDispositionPreference: #INLINE }
           TmpAttachment,
-          LocalLastChangedAt
+          LocalLastChangedAt,
+           _InvoiceItems : redirected to composition child ZC_INVOICE_ITEM
 
 }
